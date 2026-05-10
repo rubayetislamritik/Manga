@@ -20,18 +20,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async headers() {
-    return [
-      {
-        source: "/(.*)",
-        headers: [
-          // Removed X-Frame-Options restriction so the app can be embedded
-          // in iframes (e.g. Arena preview). Use CSP frame-ancestors instead
-          // if you need to restrict embedding to specific origins later.
-        ],
-      },
-    ];
-  },
+  // No custom headers needed — default Next.js security headers apply.
 };
 
 export default nextConfig;
