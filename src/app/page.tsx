@@ -95,23 +95,30 @@ type Tab = "home" | "sources" | "favorites" | "history" | "settings";
 type HomeView = "popular" | "latest" | "search";
 
 const STATUS_COLORS: Record<string, string> = {
-  ongoing: "bg-green-500",
+  ongoing: "bg-emerald-500",
   completed: "bg-blue-500",
-  hiatus: "bg-yellow-500",
+  hiatus: "bg-amber-500",
   cancelled: "bg-red-500",
 };
 
+const STATUS_EMOJI: Record<string, string> = {
+  ongoing: "🟢",
+  completed: "✅",
+  hiatus: "⏸️",
+  cancelled: "❌",
+};
+
 const GENRE_COLORS = [
-  "bg-purple-500",
-  "bg-pink-500",
-  "bg-blue-500",
-  "bg-green-500",
-  "bg-orange-500",
-  "bg-cyan-500",
-  "bg-rose-500",
-  "bg-violet-500",
+  "bg-purple-600",
+  "bg-pink-600",
+  "bg-blue-600",
+  "bg-emerald-600",
+  "bg-orange-600",
+  "bg-cyan-600",
+  "bg-rose-600",
+  "bg-violet-600",
   "bg-amber-500",
-  "bg-teal-500",
+  "bg-teal-600",
 ];
 
 function genreColor(genre: string): string {
@@ -125,8 +132,9 @@ function MangaCover({ src, alt, className }: { src: string; alt: string; classNa
 
   if (!src || errored) {
     return (
-      <div className={`${className} flex items-center justify-center bg-gradient-to-br from-purple-900 to-pink-900 text-4xl`}>
-        📚
+      <div className={`${className} flex flex-col items-center justify-center bg-gradient-to-br from-purple-950 via-purple-900 to-pink-950`}>
+        <span className="text-4xl animate-wiggle">📚</span>
+        <span className="text-purple-400 text-[0.6rem] font-extrabold mt-1 uppercase tracking-widest">No Cover</span>
       </div>
     );
   }
@@ -152,42 +160,47 @@ function MangaCard({ manga, onClick, isFav, onFavToggle }: {
 }) {
   return (
     <div
-      className="cartoon-card cursor-pointer overflow-hidden group animate-slide-up"
+      className="manga-card-2d group animate-slide-up"
       onClick={onClick}
     >
-      <div className="relative aspect-[3/4]">
+      {/* Cover image panel */}
+      <div className="relative aspect-[3/4] manga-panel" style={{ borderRadius: "12px 12px 0 0", borderBottom: "3px solid #0d0b1a" }}>
         <MangaCover src={manga.cover} alt={manga.title} className="w-full h-full" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+        {/* Dark gradient on hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+        {/* Fav button */}
         {onFavToggle && (
           <button
             onClick={onFavToggle}
-            className="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center bg-black/60 border-2 border-white/20 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:scale-110"
+            className="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 z-10 hover:scale-125 active:scale-90"
+            style={{ background: isFav ? "#ec4899" : "rgba(0,0,0,0.7)", border: "2.5px solid #0d0b1a", boxShadow: "2px 2px 0 #0d0b1a" }}
           >
-            <Heart
-              size={14}
-              className={isFav ? "fill-red-500 text-red-500" : "text-white"}
-            />
+            <Heart size={13} className={isFav ? "fill-white text-white" : "text-white"} />
           </button>
         )}
+        {/* Status badge */}
         {manga.status && (
           <span
-            className={`absolute top-2 left-2 ${STATUS_COLORS[manga.status] || "bg-gray-500"} text-white text-[0.6rem] font-900 px-2 py-0.5 rounded-full border border-black/30 capitalize font-extrabold`}
+            className={`absolute top-2 left-2 ${STATUS_COLORS[manga.status] || "bg-gray-600"} text-white text-[0.58rem] px-2 py-0.5 capitalize font-extrabold`}
+            style={{ borderRadius: "6px", border: "2px solid #0d0b1a", boxShadow: "2px 2px 0 #0d0b1a" }}
           >
-            {manga.status}
+            {STATUS_EMOJI[manga.status] || ""} {manga.status}
           </span>
         )}
+        {/* Hover title overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <p className="text-white text-xs font-bold line-clamp-2">{manga.title}</p>
+          <p className="text-white text-[0.7rem] font-extrabold line-clamp-2 drop-shadow-lg">{manga.title}</p>
         </div>
       </div>
-      <div className="p-2">
-        <h3 className="text-white text-xs font-extrabold line-clamp-2 leading-tight mb-1">
+      {/* Info panel */}
+      <div className="p-2.5">
+        <h3 className="text-white text-[0.72rem] font-extrabold line-clamp-2 leading-tight mb-1.5">
           {manga.title}
         </h3>
         {manga.genres.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {manga.genres.slice(0, 2).map((g) => (
-              <span key={g} className={`cartoon-tag ${genreColor(g)} text-white`}>
+              <span key={g} className={`cartoon-tag genre-pill ${genreColor(g)} text-white`}>
                 {g}
               </span>
             ))}
@@ -199,19 +212,25 @@ function MangaCard({ manga, onClick, isFav, onFavToggle }: {
 }
 
 function SourceCard({ source, onClick }: { source: MangaSource; onClick: () => void }) {
+  const typeColor =
+    source.type === "manhwa" ? "bg-blue-600" :
+    source.type === "manhua" ? "bg-red-600" :
+    source.type === "comics" ? "bg-amber-500" :
+    "bg-purple-600";
   return (
-    <div className="source-card" onClick={onClick}>
-      <div className="text-3xl mb-2">{source.icon}</div>
-      <h3 className="text-white font-extrabold text-sm truncate">{source.name}</h3>
-      <p className="text-slate-400 text-xs font-bold mt-1 truncate">{source.domain}</p>
+    <div className="source-card group" onClick={onClick}>
+      {/* Icon with bubble */}
+      <div
+        className="w-12 h-12 mx-auto mb-2 flex items-center justify-center rounded-xl text-2xl group-hover:animate-wiggle"
+        style={{ background: "#13112a", border: "2.5px solid #2d2b50", boxShadow: "3px 3px 0 #0d0b1a" }}
+      >
+        {source.icon}
+      </div>
+      <h3 className="text-white font-extrabold text-xs truncate">{source.name}</h3>
+      <p className="text-slate-500 text-[0.6rem] font-bold mt-0.5 truncate">{source.domain}</p>
       <div className="flex items-center justify-center gap-1 mt-2">
-        <span className="text-base">{source.langFlag}</span>
-        <span className={`cartoon-tag ${
-          source.type === "manhwa" ? "bg-blue-600" :
-          source.type === "manhua" ? "bg-red-600" :
-          source.type === "comics" ? "bg-yellow-600" :
-          "bg-purple-600"
-        } text-white capitalize`}>
+        <span className="text-sm">{source.langFlag}</span>
+        <span className={`cartoon-tag ${typeColor} text-white capitalize`}>
           {source.type}
         </span>
       </div>
@@ -223,11 +242,15 @@ function LoadingSkeleton({ count = 12 }: { count?: number }) {
   return (
     <div className="manga-grid">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="cartoon-card overflow-hidden">
-          <div className="aspect-[3/4] skeleton" />
-          <div className="p-2 space-y-2">
-            <div className="skeleton h-3 rounded w-full" />
-            <div className="skeleton h-2 rounded w-2/3" />
+        <div key={i} className="manga-card-2d overflow-hidden" style={{ animationDelay: `${i * 40}ms` }}>
+          <div className="aspect-[3/4] skeleton" style={{ borderRadius: "12px 12px 0 0" }} />
+          <div className="p-2.5 space-y-2">
+            <div className="skeleton h-3 rounded-lg w-full" />
+            <div className="skeleton h-2 rounded-lg w-2/3" />
+            <div className="flex gap-1">
+              <div className="skeleton h-4 rounded-full w-12" />
+              <div className="skeleton h-4 rounded-full w-10" />
+            </div>
           </div>
         </div>
       ))}
@@ -290,10 +313,10 @@ function MangaDetailModal({
   if (!manga) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm p-0 sm:p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/85 backdrop-blur-sm p-0 sm:p-4" onClick={onClose}>
       <div
-        className="w-full sm:max-w-3xl max-h-[95vh] overflow-y-auto rounded-t-3xl sm:rounded-2xl border-2 border-purple-500/30 animate-slide-up"
-        style={{ background: "#1a1a2e" }}
+        className="w-full sm:max-w-3xl max-h-[95vh] overflow-y-auto rounded-t-3xl sm:rounded-2xl animate-slide-up"
+        style={{ background: "#0b0919", border: "3px solid #3d2d70", boxShadow: "8px 8px 0 #0d0b1a" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -340,7 +363,7 @@ function MangaDetailModal({
               <button
                 onClick={() => onReadChapter(chapters[0].id, chapters[0].chapter || "1", manga)}
                 className="cartoon-btn flex-1 py-2.5 px-4 text-sm text-white flex items-center justify-center gap-2"
-                style={{ background: "linear-gradient(135deg, #7c3aed, #a855f7)" }}
+                style={{ background: "linear-gradient(135deg, #7c3aed, #ec4899)" }}
               >
                 <BookOpen size={16} />
                 Start Reading
@@ -350,12 +373,13 @@ function MangaDetailModal({
               onClick={() => onFavToggle(manga)}
               className={`cartoon-btn px-4 py-2.5 flex items-center gap-2 text-sm font-bold ${
                 favorites.has(manga.id)
-                  ? "bg-red-500 text-white"
-                  : "bg-slate-700 text-white"
+                  ? "text-white"
+                  : "text-white"
               }`}
+              style={{ background: favorites.has(manga.id) ? "#ec4899" : "#17152e", border: "2.5px solid #0d0b1a", boxShadow: "3px 3px 0 #0d0b1a" }}
             >
               <Heart size={16} className={favorites.has(manga.id) ? "fill-white" : ""} />
-              {favorites.has(manga.id) ? "Saved" : "Save"}
+              {favorites.has(manga.id) ? "Saved ✓" : "Save"}
             </button>
           </div>
 
@@ -382,12 +406,15 @@ function MangaDetailModal({
 
           {/* Language selector */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-slate-400 text-xs font-bold uppercase tracking-wide">Language:</span>
+            <span className="text-slate-500 text-[0.65rem] font-extrabold uppercase tracking-widest">Language:</span>
             {["en", "ja", "ko", "zh", "fr", "es", "pt", "ru"].map((l) => (
               <button
                 key={l}
                 onClick={() => { setChapLang(l); setChapOffset(0); }}
-                className={`cartoon-btn px-3 py-1 text-xs font-extrabold ${chapLang === l ? "bg-purple-600 text-white" : "bg-slate-700 text-slate-200"}`}
+                className={`cartoon-btn px-3 py-1 text-xs font-extrabold`}
+                style={chapLang === l
+                  ? { background: "linear-gradient(135deg,#7c3aed,#a855f7)", color: "white" }
+                  : { background: "#13112a", color: "#94a3b8" }}
               >
                 {l.toUpperCase()}
               </button>
@@ -423,29 +450,33 @@ function MangaDetailModal({
 
             {chapters.length === 0 ? (
               <div className="text-center py-8 text-slate-400 font-bold">
-                <div className="text-4xl mb-2">😢</div>
-                <p>No chapters found for {chapLang.toUpperCase()} language</p>
-                <p className="text-xs mt-1">Try another language above!</p>
+                <div className="text-5xl mb-2 animate-bounce-sub">😢</div>
+                <p className="font-extrabold">No chapters in {chapLang.toUpperCase()}</p>
+                <p className="text-xs mt-1 text-slate-500">Try another language above!</p>
               </div>
             ) : (
               <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
                 {displayChapters.map((c) => (
                   <div
                     key={c.id}
-                    className="chapter-item bg-[#16213e]"
+                    className="chapter-item"
+                    style={{ background: "#13112a" }}
                     onClick={() => onReadChapter(c.id, c.chapter || "?", manga)}
                   >
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="text-purple-400 font-extrabold text-sm flex-shrink-0">
+                      <span
+                        className="font-extrabold text-xs flex-shrink-0 px-2 py-0.5 rounded-md"
+                        style={{ background: "#7c3aed", color: "white", border: "2px solid #0d0b1a", boxShadow: "2px 2px 0 #0d0b1a" }}
+                      >
                         Ch.{c.chapter || "?"}
                       </span>
-                      <span className="text-slate-200 text-xs font-semibold truncate">
+                      <span className="text-slate-300 text-xs font-semibold truncate">
                         {c.title || (c.volume ? `Vol.${c.volume}` : "")}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="text-slate-500 text-xs">{c.pages}p</span>
-                      <BookOpen size={14} className="text-purple-400" />
+                      <span className="text-slate-600 text-xs">{c.pages}p</span>
+                      <BookOpen size={13} className="text-purple-500" />
                     </div>
                   </div>
                 ))}
@@ -578,26 +609,29 @@ function Reader({
     <div className="fixed inset-0 z-[100] bg-black flex flex-col">
       {/* Top bar */}
       <div
-        className={`absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/90 to-transparent px-4 py-3 flex items-center gap-3 transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0"}`}
+        className={`absolute top-0 left-0 right-0 z-10 px-4 py-3 flex items-center gap-3 transition-opacity duration-300 ${showControls ? "opacity-100" : "opacity-0"}`}
+        style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.95), transparent)" }}
       >
-        <button onClick={onClose} className="cartoon-btn p-2 bg-slate-800 text-white">
+        <button onClick={onClose} className="cartoon-btn p-2 text-white" style={{ background: "#17152e" }}>
           <ArrowLeft size={18} />
         </button>
         <div className="flex-1 min-w-0">
-          <p className="text-white font-extrabold text-sm truncate">{manga.title}</p>
-          <p className="text-purple-300 text-xs font-bold">Chapter {activeChapterNum}</p>
+          <p className="text-white font-extrabold text-sm truncate manga-title-font text-lg">{manga.title}</p>
+          <p className="text-purple-300 text-xs font-extrabold">Chapter {activeChapterNum}</p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setDataSaver(!dataSaver)}
-            className={`cartoon-btn p-2 text-xs font-bold ${dataSaver ? "bg-green-600 text-white" : "bg-slate-700 text-slate-200"}`}
+            className={`cartoon-btn p-2 text-xs font-bold`}
+            style={{ background: dataSaver ? "#16a34a" : "#17152e", color: "white" }}
             title="Data Saver"
           >
             {dataSaver ? <Moon size={14} /> : <Sun size={14} />}
           </button>
           <button
             onClick={() => setMode(mode === "scroll" ? "page" : "scroll")}
-            className="cartoon-btn px-3 py-2 bg-slate-700 text-white text-xs font-bold"
+            className="cartoon-btn px-3 py-2 text-white text-xs font-extrabold"
+            style={{ background: "#17152e" }}
           >
             {mode === "scroll" ? "📜 Scroll" : "📄 Page"}
           </button>
@@ -934,17 +968,20 @@ export default function App() {
   return (
     <div className="min-h-screen flex" style={{ background: "#0f0f1a" }}>
       {/* Sidebar (desktop) */}
-      <aside className="hidden md:flex flex-col w-60 border-r-2 border-purple-900/30 fixed top-0 left-0 h-full z-20"
-        style={{ background: "#0d0d1f" }}>
+      <aside className="hidden md:flex flex-col w-60 border-r-2 border-purple-900/40 fixed top-0 left-0 h-full z-20"
+        style={{ background: "#0b0919" }}>
         {/* Logo */}
-        <div className="p-5 border-b-2 border-purple-900/30">
+        <div className="p-5 border-b-3 border-purple-900/40" style={{ borderBottom: "3px solid rgba(88,28,220,0.2)" }}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 flex-shrink-0">
-              <img src="/logo.svg" alt="MangaVerse" className="w-full h-full animate-wiggle" />
+            <div
+              className="w-11 h-11 flex-shrink-0 flex items-center justify-center rounded-xl animate-wiggle"
+              style={{ background: "linear-gradient(135deg,#7c3aed,#ec4899)", border: "3px solid #0d0b1a", boxShadow: "3px 3px 0 #0d0b1a" }}
+            >
+              <img src="/logo.svg" alt="MangaVerse" className="w-8 h-8" />
             </div>
             <div>
               <h1 className="manga-title-font text-2xl gradient-text-purple leading-none">MangaVerse</h1>
-              <p className="text-slate-500 text-xs font-bold">Read. Explore. Discover.</p>
+              <p className="text-slate-500 text-[0.65rem] font-extrabold uppercase tracking-wider">Read. Explore. Discover.</p>
             </div>
           </div>
         </div>
@@ -966,56 +1003,61 @@ export default function App() {
         </nav>
 
         {/* Stats */}
-        <div className="p-4 border-t-2 border-purple-900/30">
-          <div className="cartoon-card p-3 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-slate-400 text-xs font-bold">📚 Sources</span>
-              <span className="text-purple-400 font-extrabold text-sm">{MANGA_SOURCES.length}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-slate-400 text-xs font-bold">❤️ Saved</span>
-              <span className="text-pink-400 font-extrabold text-sm">{favorites.size}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-slate-400 text-xs font-bold">📖 Read</span>
-              <span className="text-green-400 font-extrabold text-sm">{history.length}</span>
-            </div>
+        <div className="p-4" style={{ borderTop: "3px solid rgba(88,28,220,0.2)" }}>
+          <div className="cartoon-card p-3 space-y-2.5">
+            <p className="text-slate-500 text-[0.6rem] font-extrabold uppercase tracking-widest mb-2">Your Stats</p>
+            {[
+              { label: "Sources", val: MANGA_SOURCES.length, icon: "📚", color: "text-purple-400" },
+              { label: "Saved", val: favorites.size, icon: "❤️", color: "text-pink-400" },
+              { label: "Chapters Read", val: history.length, icon: "📖", color: "text-emerald-400" },
+            ].map(s => (
+              <div key={s.label} className="flex items-center justify-between">
+                <span className="text-slate-400 text-xs font-bold">{s.icon} {s.label}</span>
+                <span className={`${s.color} font-extrabold text-sm`}>{s.val}</span>
+              </div>
+            ))}
           </div>
         </div>
       </aside>
 
-      {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
-        <div className="md:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)}>
-          <div className="w-64 h-full flex flex-col border-r-2 border-purple-900/30" style={{ background: "#0d0d1f" }} onClick={e => e.stopPropagation()}>
-            <div className="p-5 flex items-center gap-3 border-b-2 border-purple-900/30">
-              <img src="/logo.svg" alt="MangaVerse" className="w-10 h-10 animate-wiggle" />
-              <h1 className="manga-title-font text-2xl gradient-text-purple">MangaVerse</h1>
-              <button onClick={() => setSidebarOpen(false)} className="ml-auto text-slate-400"><X size={20} /></button>
-            </div>
-            <nav className="flex-1 p-3 space-y-1">
-              {navItems.map((item) => (
-                <button
-                  key={item.tab}
-                  onClick={() => { setActiveTab(item.tab); setSidebarOpen(false); }}
-                  className={`sidebar-link w-full ${activeTab === item.tab ? "active" : ""}`}
+        {/* Mobile sidebar overlay */}
+        {sidebarOpen && (
+          <div className="md:hidden fixed inset-0 z-40 bg-black/70 backdrop-blur-sm" onClick={() => setSidebarOpen(false)}>
+            <div className="w-64 h-full flex flex-col" style={{ background: "#0b0919", borderRight: "3px solid rgba(88,28,220,0.3)" }} onClick={e => e.stopPropagation()}>
+              <div className="p-5 flex items-center gap-3" style={{ borderBottom: "3px solid rgba(88,28,220,0.2)" }}>
+                <div
+                  className="w-10 h-10 flex items-center justify-center rounded-xl flex-shrink-0"
+                  style={{ background: "linear-gradient(135deg,#7c3aed,#ec4899)", border: "2.5px solid #0d0b1a", boxShadow: "3px 3px 0 #0d0b1a" }}
                 >
-                  {item.icon}
-                  <span className="flex-1 text-left">{item.label}</span>
-                  {item.badge && <span className="badge-hot px-2">{item.badge}</span>}
-                </button>
-              ))}
-            </nav>
+                  <img src="/logo.svg" alt="MangaVerse" className="w-7 h-7" />
+                </div>
+                <h1 className="manga-title-font text-2xl gradient-text-purple">MangaVerse</h1>
+                <button onClick={() => setSidebarOpen(false)} className="ml-auto text-slate-400 hover:text-white transition-colors"><X size={20} /></button>
+              </div>
+              <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+                {navItems.map((item) => (
+                  <button
+                    key={item.tab}
+                    onClick={() => { setActiveTab(item.tab); setSidebarOpen(false); }}
+                    className={`sidebar-link w-full ${activeTab === item.tab ? "active" : ""}`}
+                  >
+                    {item.icon}
+                    <span className="flex-1 text-left">{item.label}</span>
+                    {item.badge && <span className="badge-count">{item.badge}</span>}
+                  </button>
+                ))}
+              </nav>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Main content */}
       <main className="flex-1 md:ml-60 flex flex-col min-h-screen">
         {/* Top header */}
-        <header className="sticky top-0 z-30 px-4 py-3 flex items-center gap-3 border-b-2 border-purple-900/30" style={{ background: "rgba(15,15,26,0.95)", backdropFilter: "blur(12px)" }}>
+        <header className="sticky top-0 z-30 px-4 py-3 flex items-center gap-3" style={{ background: "rgba(11,9,25,0.96)", backdropFilter: "blur(16px)", borderBottom: "3px solid rgba(88,28,220,0.2)" }}>
           <button
-            className="md:hidden cartoon-btn p-2 bg-slate-800 text-white"
+            className="md:hidden cartoon-btn p-2 text-white"
+            style={{ background: "#17152e" }}
             onClick={() => setSidebarOpen(true)}
           >
             <Menu size={18} />
@@ -1023,19 +1065,24 @@ export default function App() {
 
           {/* Mobile logo */}
           <div className="md:hidden flex items-center gap-2">
-            <img src="/logo.svg" alt="MangaVerse" className="w-8 h-8" />
+            <div
+              className="w-8 h-8 flex items-center justify-center rounded-lg"
+              style={{ background: "linear-gradient(135deg,#7c3aed,#ec4899)", border: "2px solid #0d0b1a", boxShadow: "2px 2px 0 #0d0b1a" }}
+            >
+              <img src="/logo.svg" alt="MangaVerse" className="w-6 h-6" />
+            </div>
             <span className="manga-title-font text-xl gradient-text-purple">MangaVerse</span>
           </div>
 
           {/* Search */}
           <form onSubmit={handleSearch} className="flex-1 max-w-xl flex gap-2 ml-auto">
             <div className="relative flex-1">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
               <input
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="🔍 Search manga, manhwa..."
+                placeholder="Search manga, manhwa, manhua..."
                 className="cartoon-input w-full pl-9 pr-4 py-2.5 text-sm"
               />
             </div>
@@ -1053,25 +1100,37 @@ export default function App() {
             <div>
               {/* Hero banner */}
               {homeView !== "search" && !searchQuery && (
-                <div className="relative rounded-2xl overflow-hidden mb-6 p-6 md:p-8" style={{ background: "linear-gradient(135deg, #1a0a3a, #2d1b4e, #1a2a4a)" }}>
-                  <div className="panel-dots absolute inset-0" />
+                <div className="hero-banner mb-6 p-6 md:p-8">
+                  <div className="panel-dots absolute inset-0 rounded-2xl" />
+                  <div className="speed-lines absolute inset-0 rounded-2xl" />
                   <div className="relative flex items-center gap-6">
                     <div className="animate-float flex-shrink-0 hidden sm:block">
-                      <img src="/logo.svg" alt="MangaVerse" className="w-20 h-20 md:w-28 md:h-28" />
+                      <div
+                        className="w-20 h-20 md:w-28 md:h-28 flex items-center justify-center rounded-2xl"
+                        style={{ background: "linear-gradient(135deg,#7c3aed,#ec4899)", border: "4px solid #0d0b1a", boxShadow: "6px 6px 0 #0d0b1a" }}
+                      >
+                        <img src="/logo.svg" alt="MangaVerse" className="w-16 h-16 md:w-20 md:h-20" />
+                      </div>
                     </div>
                     <div>
-                      <h1 className="manga-title-font text-4xl md:text-5xl gradient-text-purple mb-1">
-                        MangaVerse! 🎉
+                      <h1 className="manga-title-font text-4xl md:text-6xl gradient-text-purple mb-1">
+                        MangaVerse!
                       </h1>
                       <p className="text-slate-300 font-bold text-sm md:text-base max-w-md">
-                        Read manga from <span className="text-yellow-400 font-extrabold">{MANGA_SOURCES.length}+ sources</span> in one place. No redirects, no ads, pure reading joy! ✨
+                        Read manga from <span className="text-amber-400 font-extrabold">{MANGA_SOURCES.length}+ sources</span> in one place. No redirects, no ads, pure reading joy! ✨
                       </p>
                       <div className="flex flex-wrap gap-2 mt-3">
                         <span className="cartoon-tag bg-purple-600 text-white">🗾 Manga</span>
                         <span className="cartoon-tag bg-blue-600 text-white">🇰🇷 Manhwa</span>
                         <span className="cartoon-tag bg-red-600 text-white">🇨🇳 Manhua</span>
-                        <span className="cartoon-tag bg-yellow-600 text-black">💥 Comics</span>
+                        <span className="cartoon-tag bg-amber-500 text-black">💥 Comics</span>
                       </div>
+                    </div>
+                  </div>
+                  {/* Scrolling ticker */}
+                  <div className="mt-4 ticker-wrap rounded-xl overflow-hidden" style={{ background: "rgba(0,0,0,0.3)", border: "2px solid rgba(124,58,237,0.3)", padding: "6px 0" }}>
+                    <div className="ticker-content text-xs font-extrabold text-purple-300 whitespace-nowrap">
+                      &nbsp;&nbsp;🔥 HOT: One Piece &bull; Jujutsu Kaisen &bull; Solo Leveling &bull; Chainsaw Man &bull; Demon Slayer &bull; Attack on Titan &bull; My Hero Academia &bull; Spy x Family &bull; Blue Lock &bull; Vinland Saga &bull; Berserk &bull; Bleach &bull; Naruto &bull; Dragon Ball &bull; Noblesse &bull; Tower of God &nbsp;&nbsp;🔥 HOT: One Piece &bull; Jujutsu Kaisen &bull; Solo Leveling &bull; Chainsaw Man &bull; Demon Slayer &bull; Attack on Titan &bull; My Hero Academia &bull; Spy x Family &bull; Blue Lock &bull; Vinland Saga &bull; Berserk &bull; Bleach &bull; Naruto &bull; Dragon Ball &bull; Noblesse &bull; Tower of God
                     </div>
                   </div>
                 </div>
@@ -1083,7 +1142,8 @@ export default function App() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => { setSearchQuery(""); setSearchInput(""); setHomeView("popular"); }}
-                      className="cartoon-btn px-3 py-1.5 bg-slate-700 text-white text-sm font-bold flex items-center gap-1"
+                      className="cartoon-btn px-3 py-1.5 text-white text-sm font-bold flex items-center gap-1"
+                      style={{ background: "#17152e" }}
                     >
                       <X size={14} /> Clear
                     </button>
@@ -1095,22 +1155,22 @@ export default function App() {
                   <>
                     <button
                       onClick={() => setHomeView("popular")}
-                      className={`cartoon-btn px-4 py-2 text-sm font-extrabold flex items-center gap-1.5 ${homeView === "popular" ? "text-white" : "bg-slate-700 text-slate-200"}`}
-                      style={homeView === "popular" ? { background: "linear-gradient(135deg, #7c3aed, #a855f7)" } : {}}
+                      className={`cartoon-btn px-4 py-2 text-sm font-extrabold flex items-center gap-1.5 ${homeView === "popular" ? "text-white" : "text-slate-300"}`}
+                      style={homeView === "popular" ? { background: "linear-gradient(135deg, #7c3aed, #a855f7)" } : { background: "#17152e" }}
                     >
                       <TrendingUp size={15} /> Popular
                     </button>
                     <button
                       onClick={() => setHomeView("latest")}
-                      className={`cartoon-btn px-4 py-2 text-sm font-extrabold flex items-center gap-1.5 ${homeView === "latest" ? "text-white" : "bg-slate-700 text-slate-200"}`}
-                      style={homeView === "latest" ? { background: "linear-gradient(135deg, #f97316, #fbbf24)" } : {}}
+                      className={`cartoon-btn px-4 py-2 text-sm font-extrabold flex items-center gap-1.5 ${homeView === "latest" ? "text-white" : "text-slate-300"}`}
+                      style={homeView === "latest" ? { background: "linear-gradient(135deg, #f97316, #fbbf24)" } : { background: "#17152e" }}
                     >
                       <Clock size={15} /> Latest
                     </button>
                   </>
                 )}
                 {!loading && mangas.length > 0 && (
-                  <span className="ml-auto text-slate-400 text-xs font-bold">
+                  <span className="ml-auto text-slate-500 text-xs font-bold">
                     {mangas.length} results
                   </span>
                 )}
@@ -1402,22 +1462,29 @@ export default function App() {
         </div>
 
         {/* Bottom mobile nav */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 border-t-2 border-purple-900/30 flex" style={{ background: "rgba(13,13,31,0.97)" }}>
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 flex" style={{ background: "rgba(11,9,25,0.97)", borderTop: "3px solid rgba(88,28,220,0.25)" }}>
           {navItems.map((item) => (
             <button
               key={item.tab}
               onClick={() => setActiveTab(item.tab)}
-              className={`flex-1 flex flex-col items-center gap-1 py-2.5 text-xs font-extrabold transition-colors ${
-                activeTab === item.tab ? "text-purple-400" : "text-slate-500"
+              className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-extrabold transition-all duration-150 ${
+                activeTab === item.tab ? "text-purple-300" : "text-slate-600"
               }`}
             >
               <div className="relative">
-                {item.icon}
+                <div
+                  className={`flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-150 ${
+                    activeTab === item.tab ? "" : ""
+                  }`}
+                  style={activeTab === item.tab ? { background: "linear-gradient(135deg,#7c3aed,#a855f7)", border: "2px solid #0d0b1a", boxShadow: "2px 2px 0 #0d0b1a" } : {}}
+                >
+                  {item.icon}
+                </div>
                 {item.badge && (
-                  <span className="absolute -top-1.5 -right-2 badge-hot text-black px-1 text-[0.5rem]">{item.badge}</span>
+                  <span className="absolute -top-1 -right-2 badge-count text-[0.5rem] px-1">{item.badge}</span>
                 )}
               </div>
-              <span className="text-[0.65rem]">{item.label}</span>
+              <span className="text-[0.6rem]">{item.label}</span>
             </button>
           ))}
         </nav>
@@ -1455,7 +1522,7 @@ export default function App() {
 
       {/* Notification */}
       {notification && (
-        <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-[200] cartoon-card px-5 py-3 text-white font-extrabold text-sm whitespace-nowrap animate-slide-up border-2 border-purple-500">
+        <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-[200] notif-toast animate-pop-in">
           {notification}
         </div>
       )}
