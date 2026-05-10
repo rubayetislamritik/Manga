@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <!-- Panel 1 top-left -->
+  <rect x="1" y="1" width="21" height="21" rx="4" fill="#1a0a3a" stroke="#7c3aed" stroke-width="2.5"/>
+  <!-- Panel 2 top-right -->
+  <rect x="26" y="1" width="21" height="21" rx="4" fill="#1a0a3a" stroke="#ec4899" stroke-width="2.5"/>
+  <!-- Panel 3 bottom-left (tall) -->
+  <rect x="1" y="26" width="13" height="21" rx="4" fill="#1a0a3a" stroke="#a855f7" stroke-width="2.5"/>
+  <!-- Panel 4 bottom-mid -->
+  <rect x="18" y="26" width="13" height="21" rx="4" fill="#1a0a3a" stroke="#f97316" stroke-width="2.5"/>
+  <!-- Panel 5 bottom-right -->
+  <rect x="35" y="26" width="12" height="21" rx="4" fill="#1a0a3a" stroke="#fbbf24" stroke-width="2.5"/>
+
+  <!-- Star in panel 1 -->
+  <polygon points="11.5,7 12.8,10.5 16.5,10.5 13.7,12.8 14.8,16.5 11.5,14.2 8.2,16.5 9.3,12.8 6.5,10.5 10.2,10.5" fill="#fbbf24"/>
+  
+  <!-- Lightning in panel 2 -->
+  <polygon points="36,5 32,13 35,13 32,21 40,11 37,11" fill="#a855f7" stroke="#1a1a2e" stroke-width="0.5"/>
+
+  <!-- Lines in panel 3 -->
+  <line x1="4" y1="31" x2="11" y2="31" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="4" y1="35" x2="11" y2="35" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="4" y1="39" x2="11" y2="39" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round"/>
+  
+  <!-- Heart in panel 4 -->
+  <path d="M24.5 30 C24.5 30 21 27.5 21 30.5 C21 32.5 24.5 35.5 24.5 35.5 C24.5 35.5 28 32.5 28 30.5 C28 27.5 24.5 30 24.5 30Z" fill="#ec4899"/>
+  
+  <!-- Book in panel 5 -->
+  <rect x="37" y="29" width="8" height="10" rx="1" fill="#7c3aed" stroke="#1a1a2e" stroke-width="1"/>
+  <line x1="41" y1="29" x2="41" y2="39" stroke="#1a1a2e" stroke-width="1"/>
+</svg>

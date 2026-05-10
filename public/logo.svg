@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="46" fill="#1a0a3a" stroke="#7c3aed" stroke-width="4"/>
+  
+  <!-- Book body -->
+  <rect x="22" y="28" width="56" height="44" rx="5" fill="#a855f7" stroke="#1a1a2e" stroke-width="3"/>
+  <rect x="22" y="28" width="28" height="44" rx="5" fill="#7c3aed" stroke="#1a1a2e" stroke-width="3"/>
+  
+  <!-- Spine line -->
+  <line x1="50" y1="29" x2="50" y2="71" stroke="#1a1a2e" stroke-width="3"/>
+  
+  <!-- Left page lines -->
+  <line x1="29" y1="40" x2="45" y2="40" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+  <line x1="29" y1="48" x2="45" y2="48" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+  <line x1="29" y1="56" x2="45" y2="56" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+  
+  <!-- Right page lines -->
+  <line x1="55" y1="40" x2="71" y2="40" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+  <line x1="55" y1="48" x2="71" y2="48" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+  <line x1="55" y1="56" x2="71" y2="56" stroke="white" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+  
+  <!-- Star accent top right -->
+  <polygon points="80,18 82,24 88,24 83,28 85,34 80,30 75,34 77,28 72,24 78,24" fill="#fbbf24" stroke="#1a1a2e" stroke-width="1.5"/>
+  
+  <!-- Speed lines (manga style) -->
+  <line x1="10" y1="20" x2="20" y2="30" stroke="#ec4899" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <line x1="6" y1="30" x2="18" y2="34" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+  <line x1="8" y1="40" x2="20" y2="42" stroke="#a855f7" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+</svg>
